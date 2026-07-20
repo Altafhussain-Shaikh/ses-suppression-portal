@@ -3,14 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SES Suppression Portal</title>
+    <title>SES Suppression List Search Portal</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📧</text></svg>">
 </head>
 <body>
     <div id="app">
-        <h1>🚀 SES Suppression Portal</h1>
-        <p>Coming soon...</p>
+        <!-- Login Section -->
+        <div id="login-section" class="login-container">
+            <div class="login-card">
+                <div class="logo">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <h1>SES Suppression Portal</h1>
+                <p>Search email addresses in SES suppression lists across all AWS regions</p>
+                <div class="features">
+                    <div class="feature">
+                        <i class="fas fa-globe"></i>
+                        <span>All AWS Regions</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Secure SSO Login</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-search"></i>
+                        <span>Real-time Search</span>
+                    </div>
+                </div>
+                <button id="sso-login-btn" class="sso-button">
+                    <i class="fas fa-sign-in-alt"></i> Login with AWS SSO
+                </button>
+                <div class="demo-note">
+                    <small><i class="fas fa-info-circle"></i> Demo mode available - click login to try</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Application -->
+        <div id="main-app" class="main-container" style="display: none;">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <h1><i class="fas fa-envelope-open-text"></i> SES Suppression Search</h1>
+                        <span class="beta-badge">DEMO</span>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-details">
+                            <span id="user-name">Demo User</span>
+                            <small id="user-email">demo@example.com</small>
+                        </div>
+                        <button id="logout-btn" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Search Section -->
+                <div class="search-container">
+                    <div class="search-header">
+                        <h2><i class="fas fa-search"></i> Search Email in Suppression Lists</h2>
+                        <p>Search for email addresses across all AWS SES regions to check suppression status</p>
+                    </div>
+                    
+                    <div class="search-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email-input">
+                                    <i class="fas fa-envelope"></i> Email Address
+                                </label>
+                                <input type="email" id="email-input" placeholder="Enter email address to search" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="search-type">
+                                    <i class="fas fa-filter"></i> Search Type
+                                </label>
+                                <select id="search-type">
+                                    <option value="all">All Suppressions</option>
+                                    <option value="bounce">Bounces Only</option>
+                                    <option value="complaint">Complaints Only</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="search-actions">
+                            <button id="search-btn" class="search-button">
+                                <i class="fas fa-search"></i> Search All Regions
+                            </button>
+                            <button id="clear-btn" class="clear-button">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Region Status -->
+                    <div id="region-status" class="region-status" style="display: none;">
+                        <h3><i class="fas fa-globe"></i> Region Search Status</h3>
+                        <div id="region-grid" class="region-grid"></div>
+                    </div>
+
+                    <!-- Loading Indicator -->
+                    <div id="loading" class="loading" style="display: none;">
+                        <div class="loading-content">
+                            <div class="spinner">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                            <h3>Searching across all AWS regions...</h3>
+                            <p id="loading-status">Initializing search...</p>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div id="progress" class="progress"></div>
+                                </div>
+                                <span id="progress-text">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div id="results-container" class="results-container" style="display: none;">
+                        <div class="results-header">
+                            <h3><i class="fas fa-chart-bar"></i> Search Results</h3>
+                            <div class="results-actions">
+                                <button id="export-btn" class="export-btn">
+                                    <i class="fas fa-download"></i> Export CSV
+                                </button>
+                            </div>
+                        </div>
+                        <div id="results-summary" class="results-summary"></div>
+                        <div id="results-table" class="results-table"></div>
+                    </div>
+                </div>
+
+                <!-- Info Section -->
+                <div class="info-section">
+                    <div class="info-card">
+                        <h3><i class="fas fa-info-circle"></i> About This Tool</h3>
+                        <p>This portal searches for email addresses in Amazon SES suppression lists across all AWS regions. It helps identify if an email address has been suppressed due to bounces or complaints.</p>
+                        <div class="info-stats">
+                            <div class="stat">
+                                <strong>27</strong>
+                                <span>AWS Regions</span>
+                            </div>
+                            <div class="stat">
+                                <strong>Real-time</strong>
+                                <span>Search Results</span>
+                            </div>
+                            <div class="stat">
+                                <strong>Demo</strong>
+                                <span>Mode Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <div class="footer-content">
+                    <p>&copy; 2024 SES Suppression Portal. Built with ❤️ for AWS SES management.</p>
+                    <div class="footer-links">
+                        <a href="https://github.com/YOUR-USERNAME/ses-suppression-portal" target="_blank">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                        <a href="https://docs.aws.amazon.com/ses/" target="_blank">
+                            <i class="fas fa-book"></i> SES Docs
+                        </a>
+                    </div>
+                </div>
+            </footer>
+        </div>
     </div>
+
+    <!-- Scripts -->
+    <script src="config/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ses-search.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
