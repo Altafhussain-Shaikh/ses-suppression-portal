@@ -4,6 +4,9 @@ provider:
   name: aws
   runtime: nodejs18.x
   region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  
+  # IAM permissions for the Lambda function
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -11,17 +14,52 @@ provider:
         - ses:ListSuppressedDestinations
         - sesv2:GetSuppressedDestination
         - sesv2:ListSuppressedDestinations
+        - ec2:DescribeRegions
       Resource: "*"
+  
+  # Environment variables
+  environment:
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
 
 functions:
   sesSearch:
-    handler: ses-search-real.handler
+    handler: handler.sesSearch
+    timeout: 30
+    memorySize: 256
     events:
       - http:
           path: ses/search
           method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+      - http:
+          path: ses/search
+          method: options
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+  # Health check endpoint
+  health:
+    handler: handler.health
+    events:
+      - http:
+          path: health
+          method: get
           cors: true
-    timeout: 30
 
 plugins:
   - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    host: 0.0.0.0
