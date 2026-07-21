@@ -1,0 +1,27 @@
+service: ses-suppression-portal
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ses:GetSuppressedDestination
+        - ses:ListSuppressedDestinations
+        - sesv2:GetSuppressedDestination
+        - sesv2:ListSuppressedDestinations
+      Resource: "*"
+
+functions:
+  sesSearch:
+    handler: ses-search-real.handler
+    events:
+      - http:
+          path: ses/search
+          method: post
+          cors: true
+    timeout: 30
+
+plugins:
+  - serverless-offline
